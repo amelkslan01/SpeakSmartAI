@@ -1,0 +1,51 @@
+import os
+from yt_dlp import YoutubeDL
+from yt_dlp.utils import download_range_func
+
+SAVE_PATH = "/content/drive/MyDrive/speaksmart_dataset"
+
+def extract_speaksmart_clips(video_data):
+    """
+    video_data: List of dictionaries with url, start, end, and filename.
+    """
+    for item in video_data:
+        # Configuration for fast, accurate clipping
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'outtmpl': f"{SAVE_PATH}/{item['name']}.%(ext)s",
+            'js_runtime': 'deno',  # Forces yt-dlp to use Deno
+            'download_ranges': download_range_func(None, [(item['start'], item['end'])]),
+            'force_keyframes_at_cuts': True, # Ensures clean cuts at specific seconds
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'wav',
+                'preferredquality': '192',
+            }],
+        }
+
+        print(f"--- Extracting: {item['name']} ---")
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([item['url']])
+
+# 1. Your specific video targets
+clips_to_download = [
+    {
+        "url": "https://www.youtube.com/watch?v=63TQzR2vTNI",
+        "start": 10, "end": 45,
+        "name": "001.wav"
+    },
+    {
+        "url": "https://www.youtube.com/watch?v=gVZ8o7W6f_E",
+        "start": 120, "end": 180,
+        "name": "002.wav"
+    },
+    {
+        "url": "https://www.youtube.com/watch?v=LFJWz9i_bqM",
+        "start": 30, "end": 90,
+        "name": "003.wav"
+    }
+]
+
+# 2. Run the extraction
+os.makedirs(SAVE_PATH, exist_ok=True)
+extract_speaksmart_clips(clips_to_download)
