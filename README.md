@@ -1,5 +1,5 @@
 
-# ClearSpeak AI
+# SpeakSmart AI
 **AI-Based Public Speaking Feedback Using Speech Pattern Analysis**
 
 ## Project Overview
